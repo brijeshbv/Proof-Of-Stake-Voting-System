@@ -7,12 +7,10 @@ if __name__ == '__main__':
     receiver = 'receiver'
     amount = '2'
     type = 'TRANSFER'
-
-
-    txn = Transaction(sender, receiver, amount, type)
-    
-
+    # creates a wallet
     wallet = Wallet()
-    signature = wallet.sign(txn.toJson())
-    txn.sign(signature)
-    print(txn.toJson())
+    txn = wallet.createTransaction(receiver, amount, type)
+
+    signatureValid = wallet.signatureValid(txn.payload(),txn.signature, wallet.publicKeyString())
+    print(txn.toJson(), signatureValid)
+

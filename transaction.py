@@ -1,7 +1,8 @@
+import json
 import uu
 import uuid
 import time
-
+import copy
 class Transaction():
 
     def __init__(self, senderPublicKey, receiverPublicKey, amount, type) -> None:
@@ -17,5 +18,11 @@ class Transaction():
     def toJson(self):
         return self.__dict__
 
+    #adds signature to transaction.
     def sign(self, signature):
         self.signature = signature
+
+    def payload(self):
+        jsonRep = copy.deepcopy(self.toJson())
+        jsonRep['signature'] = ''
+        return jsonRep
