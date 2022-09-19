@@ -26,3 +26,7 @@ class Transaction():
         jsonRep = copy.deepcopy(self.toJson())
         jsonRep['signature'] = ''
         return jsonRep
+
+
+    def equals(self, transaction):
+        return self.id == transaction.id
