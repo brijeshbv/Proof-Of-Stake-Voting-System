@@ -1,6 +1,7 @@
 from transaction import Transaction
 from transaction_pool import TransactionPool
 import pprint
+from block import Block
 from wallet import Wallet
 
 if __name__ == '__main__':
