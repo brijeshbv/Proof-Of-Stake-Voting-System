@@ -1,4 +1,5 @@
 import copy
+from os import stat
 import time
 
 class Block():
@@ -10,6 +11,12 @@ class Block():
         self.blockCount = blockCount
         self.timestamp = time.time()
         self.signature = ''
+
+    @staticmethod
+    def genesis():
+        genesisBlock = Block([],'genesisHash','genesis',0)
+        genesisBlock.timestamp = 0
+        return genesisBlock
     
     def toJson(self):
         data = {}
@@ -31,4 +38,3 @@ class Block():
     
     def addSign(self, signature):
         self.signature = signature
-
