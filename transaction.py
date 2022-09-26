@@ -19,10 +19,12 @@ class Transaction():
         return self.__dict__
 
     #adds signature to transaction.
-    def sign(self, signature):
+    def addSign(self, signature):
         self.signature = signature
 
+    
     def payload(self):
+        """The signature is removed from a copy and returned. Useful for validating transactions"""
         jsonRep = copy.deepcopy(self.toJson())
         jsonRep['signature'] = ''
         return jsonRep

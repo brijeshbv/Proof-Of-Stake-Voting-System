@@ -1,6 +1,6 @@
 from transaction import Transaction
 from transaction_pool import TransactionPool
-
+import pprint
 from wallet import Wallet
 
 if __name__ == '__main__':
@@ -14,8 +14,12 @@ if __name__ == '__main__':
 
     txn = wallet.createTransaction(receiver, amount, type)
 
-    signatureValid = wallet.signatureValid(txn.payload(),txn.signature, wallet.publicKeyString())
     
     pool.addTransaction(txn)
-    print(pool.toJson())
 
+    block = wallet.createBlock(pool.transactions,'lastHash',1)
+
+    pprint.pprint(block.toJson())
+
+    signatureValid = Wallet.signatureValid(block.payload(),block.signature,wallet.publicKeyString())
+    print(signatureValid)
