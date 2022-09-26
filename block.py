@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 import copy
-=======
->>>>>>> 5c8a6600ccd3861d36b8c0784ae38585d5061319
 import time
 
 class Block():
