@@ -5,26 +5,45 @@ import pprint
 from block import Block
 from utils import BlockChainUtils
 from wallet import Wallet
+from accountmodel import AccountModel
 
 if __name__ == '__main__':
-    sender = 'sender'
-    receiver = 'receiver'
-    amount = '2'
-    type = 'TRANSFER'
-    # creates a wallet
-    wallet = Wallet()
+    
+    blockchain = BlockChain()
     pool = TransactionPool()
 
-    txn = wallet.createTransaction(receiver, amount, type)
-    blockChain = BlockChain()
+    alice = Wallet()
+    bob = Wallet()
+    exchange = Wallet()
+    forger = Wallet()
+
+    exchangeTransaction = exchange.createTransaction(alice.publicKeyString(), 10, "EXCHANGE")
+    if not pool.transactionExists(exchangeTransaction):
+        pool.addTransaction(exchangeTransaction)
     
-    pool.addTransaction(txn)
+    coveredTransactions = blockchain.getCoveredTransactionSet(pool.transactions)
+    lastHash = BlockChainUtils.hash(blockchain.blocks[-1].payload()).hexdigest()
+    blockCount = blockchain.blocks[-1].blockCount + 1
+    blockOne = forger.createBlock(coveredTransactions, lastHash, blockCount)
+    blockchain.addBlock(blockOne)
+    
+    #remove blockOne from transaction pool after adding the block to the blockchain inorder to avoid block duplication
 
-    lastHash = BlockChainUtils.hash(blockChain.blocks[-1].payload()).hexdigest()
-    newBlockCount = blockChain.blocks[-1].blockCount + 1
-    block = wallet.createBlock(pool.transactions,lastHash, newBlockCount)
+    pool.removeFromPool(blockOne.transactions)  
 
-    # add blocks to chain
-    blockChain.addBlock(block)
+    # alice wants to send 5 token to bob
+    transaction = alice.createTransaction(bob.publicKeyString(), 5, 'TRANSFER')
 
-    pprint.pprint(blockChain.toJson())
+    if not pool.transactionExists(transaction):
+        pool.addTransaction(transaction)
+
+    coveredTransactions = blockchain.getCoveredTransactionSet(pool.transactions)
+    lastHash = BlockChainUtils.hash(blockchain.blocks[-1].payload()).hexdigest()
+    blockCount = blockchain.blocks[-1].blockCount + 1
+    blockTwo = forger.createBlock(coveredTransactions, lastHash, blockCount)
+    blockchain.addBlock(blockTwo)
+
+    #remove blockTwo from transaction pool after adding the block to blockchain
+    pool.removeFromPool(blockTwo.transactions)  
+
+    pprint.pprint(blockchain.toJson())
