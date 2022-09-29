@@ -17,3 +17,14 @@ class TransactionPool():
 
     def toJson(self):
         return self.__dict__
+
+    def removeFromPool(self, transactions):
+        newPoolTransactions = []
+        for poolTransactions in self.transactions:
+            insert = True
+            for transaction in transactions:
+                if poolTransactions.equals(transaction):
+                    insert = False
+            if(insert == True):
+                newPoolTransactions.append(poolTransactions)
+        self.transactions = newPoolTransactions
