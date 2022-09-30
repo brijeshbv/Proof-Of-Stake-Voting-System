@@ -10,6 +10,3 @@ if __name__ == '__main__':
     #initialize a node
     node = Node(hostIP = hostIP, port=port)
     node.startP2P()
-
-    if port == 10002:
-        node.p2p.connect_with_node('localhost',10001)

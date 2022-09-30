@@ -19,5 +19,5 @@ class BlockChainUtils():
 
 
     @staticmethod
-    def decode(objectToDecode):
-        return jsonpickle.decode(objectToDecode)
+    def decode(messageToDecode):
+        return jsonpickle.decode(messageToDecode)
