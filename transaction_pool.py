@@ -6,8 +6,10 @@ class TransactionPool():
         self.transactions = []
 
     def addTransaction(self, transaction):
-        if self.transactionExists(transaction) == False:
-            self.transactions.append(transaction)
+        if self.transactionExists(transaction) == True:
+            print("Transaction already exists, can't add transaction")
+            return
+        self.transactions.append(transaction)
 
     def transactionExists(self, transaction):
         for txn in self.transactions:
