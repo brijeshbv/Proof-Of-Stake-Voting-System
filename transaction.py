@@ -5,10 +5,10 @@ import time
 import copy
 class Transaction():
 
-    def __init__(self, senderPublicKey, receiverPublicKey, amount, type) -> None:
+    def __init__(self, senderPublicKey, receiverPublicKey, token, type) -> None:
         self.senderPublicKey = senderPublicKey
         self.receiverPublicKey = receiverPublicKey
-        self.amount = amount
+        self.token = token
         self.type = type
         self.id = uuid.uuid1().hex
         self.timestamp = time.time()
