@@ -13,7 +13,7 @@ class AccountModel():
             self.addAccount(publicKeyString)
         return self.balances[publicKeyString]
     
-    def updateBalance(self, publicKeyString, amount):
+    def updateBalance(self, publicKeyString, token):
         if publicKeyString not in self.accounts:
             self.addAccount(publicKeyString)
-        self.balances[publicKeyString] += amount
+        self.balances[publicKeyString] += token
