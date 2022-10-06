@@ -1,5 +1,6 @@
 
 
+BLOCK_SIZE = int(1)
 class TransactionPool():
 
     def __init__(self) -> None:
@@ -9,6 +10,7 @@ class TransactionPool():
         if self.transactionExists(transaction) == True:
             print("Transaction already exists, can't add transaction")
             return
+        print("transaction added to pool")
         self.transactions.append(transaction)
 
     def transactionExists(self, transaction):
@@ -30,3 +32,10 @@ class TransactionPool():
             if(insert == True):
                 newPoolTransactions.append(poolTransactions)
         self.transactions = newPoolTransactions
+
+    def forgerRequired(self):
+        print(len(self.transactions), "length")
+        required = len(self.transactions) >= BLOCK_SIZE
+        print("required?", required)
+        return required
+

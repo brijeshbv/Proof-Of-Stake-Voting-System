@@ -6,6 +6,13 @@ class ProofOfStake():
 
     def __init__(self) -> None:
         self.stakers = {}
+        self.setGenesisNodeStake()
+    
+    def setGenesisNodeStake(self):
+        '''sets a genesis public key as initial forger for first forge of Block chain'''
+        genesisPublicKey = open('keys/genesisPublicKey.pem','r').read()
+        # assign 1 token as stake
+        self.stakers[genesisPublicKey]= 1
 
     def update(self, publicKeystring, stake):
         if publicKeystring in self.stakers.keys():

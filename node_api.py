@@ -34,6 +34,7 @@ class NodeAPI(FlaskView):
 
     @route('transaction', methods=['POST'])
     def transaction(self):
+        print("performing transaction")
         values = request.get_json()
         if not 'transaction' in values:
             return 'Missing transaction value', 400

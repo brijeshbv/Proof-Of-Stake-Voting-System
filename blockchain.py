@@ -1,6 +1,7 @@
 
 
 from block import Block
+from proof_of_stake import ProofOfStake
 from utils import BlockChainUtils
 from accountmodel import AccountModel
 
@@ -10,6 +11,7 @@ class BlockChain():
     def __init__(self) -> None:
         self.blocks = [Block.genesis()]
         self.accountModel = AccountModel()
+        self.pos = ProofOfStake()
     
     def addBlock(self, block):
         if not self.lastBlockHashValid(block):
@@ -62,9 +64,37 @@ class BlockChain():
             self.executeTransaction(transaction)
 
     def executeTransaction(self, transaction):
+        if transaction.type == 'STAKE':
+            sender = transaction.senderPublicKey
+            receiver = transaction.receiverPublicKey
+            if sender == receiver:
+                token = transaction.token
+                self.pos.update(sender, token)
+                self.accountModel.updateBalance(sender, -token)
         sender = transaction.senderPublicKey
         receiver = transaction.receiverPublicKey
-        amount = transaction.amount
+        token = transaction.token
 
-        self.accountModel.updateBalance(sender, -amount) #update sender's account balance (deduction)
-        self.accountModel.updateBalance(receiver, amount) #update receiver's account balance
+        self.accountModel.updateBalance(sender, -token) #update sender's token balance (deduction)
+        self.accountModel.updateBalance(receiver, token) #update receiver's token balance
+
+    
+    def nextForger(self):
+        lastBlockHash = BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest()
+        nextForger = self.pos.forger(lastBlockHash)
+        return nextForger
+
+
+    def createBlock(self, transactionsFromPool, forgerWallet):
+        coveredTransactions = self.getCoveredTransactionSet(transactionsFromPool)
+        self.executeTransactions(coveredTransactions)
+        newBlock = forgerWallet.createBlock(coveredTransactions, BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest(), len(self.blocks))
+        self.blocks.append(newBlock)
+        return newBlock
+        
+    def doesTransactionExist(self, transaction):
+        for block in self.blocks:
+            for txn in block.transactions:
+                if txn.equals(transaction):
+                    return True
+        return False
