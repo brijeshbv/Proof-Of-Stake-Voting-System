@@ -9,6 +9,14 @@ class Wallet():
 
     def __init__(self):
         self.keyPair = RSA.generate(2048)
+    
+    
+    def fromKey(self, file):
+        '''assigns a predefined public key to a wallet.'''
+        key = ''
+        with open(file, 'r') as keyFile:
+            key = RSA.importKey(keyFile.read())
+        self.keyPair = key
 
     def sign(self, data):
         datahash = BlockChainUtils.hash(data)
@@ -29,10 +37,10 @@ class Wallet():
         return self.keyPair.public_key().export_key('PEM').decode('utf-8')
 
 
-    def createTransaction(self, receiverPublicKey, amount, type):
+    def createTransaction(self, receiverPublicKey, token, type):
         transaction = Transaction(self.publicKeyString(),
         receiverPublicKey, 
-        amount, 
+        token, 
         type)
         signature = self.sign(transaction.payload())
         transaction.addSign(signature)
