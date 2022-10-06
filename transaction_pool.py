@@ -28,6 +28,7 @@ class TransactionPool():
             if(insert == True):
                 newPoolTransactions.append(poolTransactions)
         self.transactions = newPoolTransactions
+        print("transactions left in pool:", len(self.transactions) )
 
     def forgerRequired(self):
         print(len(self.transactions), "length")

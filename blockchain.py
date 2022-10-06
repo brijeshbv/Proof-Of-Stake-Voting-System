@@ -15,7 +15,8 @@ class BlockChain():
     
     def addBlock(self, block):
         self.executeTransactions(block.transactions)
-        self.blocks.append(block)
+        if self.blocks[-1].blockCount < block.blockCount:
+            self.blocks.append(block)
     
     def toJson(self):
         data = {}
@@ -28,6 +29,7 @@ class BlockChain():
 
     def blockCountValid(self, block):
         """checks if new incoming block count is valid"""
+        print(f"have: {self.blocks[-1].blockCount}, got {block.blockCount}")
         return self.blocks[-1].blockCount == block.blockCount -1
     
     def lastBlockHashValid(self, block):
@@ -84,6 +86,7 @@ class BlockChain():
         self.executeTransactions(coveredTransactions)
         newBlock = forgerWallet.createBlock(coveredTransactions, BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest(), len(self.blocks))
         self.blocks.append(newBlock)
+        print(f"created block  no {len(self.blocks)}")
         return newBlock
         
     def doesTransactionExist(self, transaction):

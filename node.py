@@ -81,7 +81,7 @@ class Node():
         if forger == self.wallet.publicKeyString():
             print("I am the next forger")
             newBlock = self.blockChain.createBlock(self.transactionPool.transactions, self.wallet)
-            self.transactionPool.removeFromPool(newBlock.transactions)
+            self.transactionPool.removeFromPool(self.transactionPool.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK',newBlock)
             encodedMessage = BlockChainUtils.encode(message)
             self.p2p.broadcast(encodedMessage)
@@ -91,6 +91,7 @@ class Node():
     def handleBlockChainRequest(self, connectedNode):
         message = Message(self.p2p.socketConnector, 'BLOCKCHAIN', self.blockChain)
         encodedMessage = BlockChainUtils.encode(message)
+        print("sending blockchain to node", connectedNode)
         self.p2p.send(connectedNode, encodedMessage)
 
     def handleBlockChain(self, blockChain):
@@ -98,8 +99,9 @@ class Node():
         localBlockChainCount = len(localBlockChainCopy.blocks)
         receivedBlockChainCount = len(blockChain.blocks)
         if localBlockChainCount < receivedBlockChainCount:
+            print(f'local {localBlockChainCount}, receivedBlockChainCount {receivedBlockChainCount}')
             for blockNumber, block in enumerate(blockChain.blocks):
-                if blockNumber > localBlockChainCount:
+                if blockNumber >= localBlockChainCount :
                     print("block added here 2")
                     localBlockChainCopy.addBlock(block)
                     self.transactionPool.removeFromPool(block.transactions)
