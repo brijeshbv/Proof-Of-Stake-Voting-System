@@ -60,7 +60,8 @@ class Node():
         if not blockCountValid :
             print("blockcount invalid, requesting for longer blockchains")
             self.requestChain()
-        if lastBlockHashValid and forgerValid and transactionsValid and transactionsValid and signatureValid:
+        if lastBlockHashValid and forgerValid and transactionsValid and transactionsValid and signatureValid and blockCountValid:
+            print("block added here 1")
             self.blockChain.addBlock(block)
             self.transactionPool.removeFromPool(block.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK',block)
@@ -99,6 +100,7 @@ class Node():
         if localBlockChainCount < receivedBlockChainCount:
             for blockNumber, block in enumerate(blockChain.blocks):
                 if blockNumber > localBlockChainCount:
+                    print("block added here 2")
                     localBlockChainCopy.addBlock(block)
                     self.transactionPool.removeFromPool(block.transactions)
             self.blockChain = localBlockChainCopy

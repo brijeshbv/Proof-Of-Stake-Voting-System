@@ -1,3 +1,4 @@
+from time import sleep
 from turtle import pos
 from wallet import Wallet
 from utils import BlockChainUtils
@@ -20,8 +21,9 @@ if __name__ == '__main__':
     exchange = Wallet()
 
     postTransaction(exchange, alice, 100, 'EXCHANGE')
-    postTransaction(exchange, bob, 100, 'EXCHANGE')
+    sleep(0.25)
     postTransaction(alice, alice, 25, 'STAKE')
-
+    sleep(1)
     postTransaction(alice, bob, 1, 'TRANSFER')
+
     
