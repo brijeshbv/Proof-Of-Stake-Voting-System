@@ -1,4 +1,4 @@
-from email import message
+import copy
 from blockchain import BlockChain
 from transaction_pool import TransactionPool
 from utils import BlockChainUtils
@@ -37,7 +37,8 @@ class Node():
         signatureValid = Wallet.signatureValid(data, signature, senderPublicKey)
         transactionExists = self.transactionPool.transactionExists(transaction)
         isTransactionInBlockChain = self.blockChain.doesTransactionExist(transaction)
-        print(isTransactionInBlockChain)
+        ## ensure that transaction is not already in blockchain to avoid the case where broadcasted covered transaction in a block
+        ## will be returned again through a broadcast and added back to transaction pool.
         if not isTransactionInBlockChain and not transactionExists and signatureValid:
             self.transactionPool.addTransaction(transaction)
             message = Message(self.p2p.socketConnector, 'TRANSACTION', transaction)
@@ -47,6 +48,33 @@ class Node():
             if forgerRequired == True :
                 self.forge()
     
+    def handleBlock(self, block):
+        forger = block.forger
+        blockHash = block.payload()
+        signature = block.signature
+        blockCountValid = self.blockChain.blockCountValid(block)
+        lastBlockHashValid = self.blockChain.lastBlockHashValid(block)
+        forgerValid = self.blockChain.forgerValid(block)
+        transactionsValid = self.blockChain.transactionsValid(block.transactions)
+        signatureValid = self.wallet.signatureValid(blockHash, signature, forger)
+        if not blockCountValid :
+            print("blockcount invalid, requesting for longer blockchains")
+            self.requestChain()
+        if lastBlockHashValid and forgerValid and transactionsValid and transactionsValid and signatureValid:
+            self.blockChain.addBlock(block)
+            self.transactionPool.removeFromPool(block.transactions)
+            message = Message(self.p2p.socketConnector, 'BLOCK',block)
+            encodedMessage = BlockChainUtils.encode(message)
+            self.p2p.broadcast(encodedMessage)
+        else:
+            print("Block was invalid and not added to transaction",
+             f'\nlastBlockHashValid: {lastBlockHashValid},forgerValid :{forgerValid}, transactionsValid: {transactionsValid}, transactionsValid: {transactionsValid}')
+
+    def requestChain(self):
+        message = Message(self.p2p.socketConnector, 'BLOCKCHAINREQUEST', None )
+        encodeMessage = BlockChainUtils.encode(message)
+        self.p2p.broadcast(encodeMessage)
+
     def forge(self):
         forger = self.blockChain.nextForger()
         if forger == self.wallet.publicKeyString():
@@ -59,3 +87,18 @@ class Node():
         else:
             print("I am not the next forger")
     
+    def handleBlockChainRequest(self, connectedNode):
+        message = Message(self.p2p.socketConnector, 'BLOCKCHAIN', self.blockChain)
+        encodedMessage = BlockChainUtils.encode(message)
+        self.p2p.send(connectedNode, encodedMessage)
+
+    def handleBlockChain(self, blockChain):
+        localBlockChainCopy = copy.deepcopy(self.blockChain)
+        localBlockChainCount = len(localBlockChainCopy.blocks)
+        receivedBlockChainCount = len(blockChain.blocks)
+        if localBlockChainCount < receivedBlockChainCount:
+            for blockNumber, block in enumerate(blockChain.blocks):
+                if blockNumber > localBlockChainCount:
+                    localBlockChainCopy.addBlock(block)
+                    self.transactionPool.removeFromPool(block.transactions)
+            self.blockChain = localBlockChainCopy

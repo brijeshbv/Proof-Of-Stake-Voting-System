@@ -14,12 +14,6 @@ class BlockChain():
         self.pos = ProofOfStake()
     
     def addBlock(self, block):
-        if not self.lastBlockHashValid(block):
-            print("last block hash is not valid")
-            return
-        if not self.blockCountValid(block):
-            print("block count not valid")
-            return
         self.executeTransactions(block.transactions)
         self.blocks.append(block)
     
@@ -98,3 +92,17 @@ class BlockChain():
                 if txn.equals(transaction):
                     return True
         return False
+    
+    def forgerValid(self, block):
+        forgerPublicKey = self.pos.forger(block.lastHash)
+        proposedBlockForger = block.forger
+        if forgerPublicKey == proposedBlockForger:
+            return True
+        return False
+    
+    def transactionsValid(self, transactions):
+        coveredTransactions = self.getCoveredTransactionSet(transactions)
+        if len(coveredTransactions) == len(transactions):
+            return True
+        return False
+

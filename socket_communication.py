@@ -40,6 +40,15 @@ class SocketCommunication(Node):
         elif decodedMessage.messageType == 'TRANSACTION':
             transaction = decodedMessage.data
             self.node.handleTransaction(transaction)
+        elif decodedMessage.messageType == 'BLOCK':
+            block = decodedMessage.data
+            self.node.handleBlock(block)
+        elif decodedMessage.messageType == 'BLOCKCHAINREQUEST':
+            self.node.handleBlockChainRequest(node)
+        elif decodedMessage.messageType == 'BLOCKCHAIN':
+            print("receieved a particular blockchain from node: ",node )
+            blockChain = decodedMessage.data
+            self.node.handleBlockChain(blockChain)
 
 
     def send(self, receiver, message):
