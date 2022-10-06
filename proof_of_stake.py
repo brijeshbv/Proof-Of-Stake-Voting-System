@@ -46,7 +46,6 @@ class ProofOfStake():
             if leastOffSet is None or offSet < leastOffSet :
                 leastOffSet = offSet
                 winnerLot = lot
-        print(f'the winner lot was {winnerLot.publicKey}')
         return winnerLot
 
     def forger(self, lastBlockHash):

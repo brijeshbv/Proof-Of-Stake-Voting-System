@@ -37,10 +37,10 @@ class Wallet():
         return self.keyPair.public_key().export_key('PEM').decode('utf-8')
 
 
-    def createTransaction(self, receiverPublicKey, amount, type):
+    def createTransaction(self, receiverPublicKey, token, type):
         transaction = Transaction(self.publicKeyString(),
         receiverPublicKey, 
-        amount, 
+        token, 
         type)
         signature = self.sign(transaction.payload())
         transaction.addSign(signature)

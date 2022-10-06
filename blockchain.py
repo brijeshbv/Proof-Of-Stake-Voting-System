@@ -48,7 +48,7 @@ class BlockChain():
         if transaction.type == "EXCHANGE":
             return True
         senderBalance = self.accountModel.getBalance(transaction.senderPublicKey)
-        if senderBalance >= transaction.amount:
+        if senderBalance >= transaction.token:
             return True
         else:
             return False

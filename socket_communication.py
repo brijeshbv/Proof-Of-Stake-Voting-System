@@ -46,7 +46,6 @@ class SocketCommunication(Node):
         elif decodedMessage.messageType == 'BLOCKCHAINREQUEST':
             self.node.handleBlockChainRequest(node)
         elif decodedMessage.messageType == 'BLOCKCHAIN':
-            print("receieved a particular blockchain from node: ",node )
             blockChain = decodedMessage.data
             self.node.handleBlockChain(blockChain)
 
