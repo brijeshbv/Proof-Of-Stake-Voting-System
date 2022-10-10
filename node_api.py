@@ -44,6 +44,16 @@ class NodeAPI(FlaskView):
         return jsonify(response), 201
     
     
+    @route('register', methods=['POST'])
+    def register(self):
+        print("Registering voter")
+        values = request.get_json()
+        if not 'publicKey' in values:
+            return 'Missing publicKey value', 400
+        publicKey = BlockChainUtils.decode(values['publicKey'])
+        node.handleRegistration(publicKey)
+        response = {'message': 'Received registration request'}
+        return jsonify(response), 201
     
 
     

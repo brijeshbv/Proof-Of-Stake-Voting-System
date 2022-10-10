@@ -1,7 +1,8 @@
-from os import stat
+
 from Crypto.Hash import SHA256
 import json
 import jsonpickle
+from Crypto.PublicKey import RSA
 
 class BlockChainUtils():
 
@@ -21,3 +22,20 @@ class BlockChainUtils():
     @staticmethod
     def decode(messageToDecode):
         return jsonpickle.decode(messageToDecode)
+
+    
+    @staticmethod
+    def generateRSAPrivatePublicKeyPair():
+        return RSA.generate(2048)
+
+
+if __name__ == "__main__":
+
+    for i in range(1,11):
+        blk = BlockChainUtils.generateRSAPrivatePublicKeyPair()
+        f = open(f'keys/voter{i}PrivateKey.pem','wb')
+        f.write(blk.export_key('PEM'))
+        f.close()
+        f = open(f'keys/voter{i}PublicKey.pem','wb')
+        f.write(blk.public_key().export_key('PEM'))
+        f.close()
