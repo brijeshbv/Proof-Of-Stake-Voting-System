@@ -29,8 +29,18 @@ class BlockChainUtils():
         return RSA.generate(2048)
 
 
+
 if __name__ == "__main__":
 
+    for i in range(1,6):
+        blk = BlockChainUtils.generateRSAPrivatePublicKeyPair()
+        f = open(f'keys/candidate{i}PrivateKey.pem','wb')
+        f.write(blk.export_key('PEM'))
+        f.close()
+        f = open(f'keys/candidate{i}PublicKey.pem','wb')
+        f.write(blk.public_key().export_key('PEM'))
+        f.close()
+        
     for i in range(1,11):
         blk = BlockChainUtils.generateRSAPrivatePublicKeyPair()
         f = open(f'keys/voter{i}PrivateKey.pem','wb')
@@ -39,3 +49,4 @@ if __name__ == "__main__":
         f = open(f'keys/voter{i}PublicKey.pem','wb')
         f.write(blk.public_key().export_key('PEM'))
         f.close()
+

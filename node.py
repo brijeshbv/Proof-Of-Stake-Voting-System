@@ -1,4 +1,5 @@
 import copy
+from pprint import pprint
 from blockchain import BlockChain
 from transaction_pool import TransactionPool
 from utils import BlockChainUtils
@@ -13,7 +14,7 @@ class Node():
     def __init__(self, hostIP, port, key = None) -> None:
         self.transactionPool = TransactionPool()
         self.wallet = Wallet()
-        self.blockChain = BlockChain()
+        self.blockChain = BlockChain(self.wallet)
         self.hostIP = hostIP
         self.port = port
         self.p2p = None
@@ -24,8 +25,8 @@ class Node():
         self.p2p = SocketCommunication(self.hostIP, self.port)
         self.p2p.startSocketCommunication(self)
 
-    def startAPI(self, apiPort):
-        self.api = NodeAPI()
+    def startAPI(self, apiPort, api):
+        self.api = api
         self.api.injectNode(self)
         self.api.start(apiPort)
 
@@ -37,6 +38,16 @@ class Node():
         signatureValid = Wallet.signatureValid(data, signature, senderPublicKey)
         transactionExists = self.transactionPool.transactionExists(transaction)
         isTransactionInBlockChain = self.blockChain.doesTransactionExist(transaction)
+        print('signature valid', signatureValid, transactionExists, isTransactionInBlockChain)
+        if transaction.type == 'EXCHANGE':
+            ## Exchange transactions are only permitted by genesis node
+            genesisPubicKey = open('keys/genesisPublicKey.pem','r').read()
+            isExchangeSignatureValid = Wallet.signatureValid(data, signature,genesisPubicKey )
+            if not isExchangeSignatureValid:
+                print('Exchange transaction from non-genesis node not permitted')
+                return False
+            else:
+                print('Exchange transaction permitted')
         ## ensure that transaction is not already in blockchain to avoid the case where broadcasted covered transaction in a block
         ## will be returned again through a broadcast and added back to transaction pool.
         if not isTransactionInBlockChain and not transactionExists and signatureValid:
@@ -47,6 +58,10 @@ class Node():
             forgerRequired = self.transactionPool.forgerRequired()
             if forgerRequired == True :
                 self.forge()
+            return True
+        
+        print("transaction not added to pool")
+        return False
     
     def handleBlock(self, block):
         forger = block.forger
@@ -90,6 +105,7 @@ class Node():
     
     def handleBlockChainRequest(self, connectedNode):
         message = Message(self.p2p.socketConnector, 'BLOCKCHAIN', self.blockChain)
+        pprint(message)
         encodedMessage = BlockChainUtils.encode(message)
         print("sending blockchain to node", connectedNode)
         self.p2p.send(connectedNode, encodedMessage)

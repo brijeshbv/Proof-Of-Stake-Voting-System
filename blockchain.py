@@ -4,15 +4,19 @@ from block import Block
 from proof_of_stake import ProofOfStake
 from utils import BlockChainUtils
 from accountmodel import AccountModel
+from wallet import Wallet
 
 class BlockChain():
     
 
-    def __init__(self) -> None:
+    def __init__(self, nodeWallet) -> None:
         self.blocks = [Block.genesis()]
         self.accountModel = AccountModel()
         self.pos = ProofOfStake()
-    
+        ## wallet associated with node that maintains dynamic instance of blockchain
+        self.nodeWallet = nodeWallet
+        
+
     def addBlock(self, block):
         self.executeTransactions(block.transactions)
         if self.blocks[-1].blockCount < block.blockCount:
@@ -43,13 +47,14 @@ class BlockChain():
             if self.transactionCovered(transaction):
                 coveredTransactions.append(transaction)
             else:
-                print("Transaction is not covered by sender")
+                print("Transaction is not covered by sender", transaction)
         return coveredTransactions
 
     def transactionCovered(self, transaction):
         if transaction.type == "EXCHANGE":
             return True
         senderBalance = self.accountModel.getBalance(transaction.senderPublicKey)
+        print('insufficient funds',senderBalance, transaction.token)
         if senderBalance >= transaction.token:
             return True
         else:

@@ -27,6 +27,10 @@ if __name__ == '__main__':
     alice = Wallet()
     alice.fromKey('keys/voter1PrivateKey.pem')
     postRegistration(alice)
+    sleep(1)
+    bob = Wallet()
+    bob.fromKey('keys/candidate1PrivateKey.pem')
+    postTransaction(alice, bob, 1, "TRANSFER")
     
 
 

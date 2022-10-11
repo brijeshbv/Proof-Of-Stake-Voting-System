@@ -1,5 +1,7 @@
 from Crypto.PublicKey import RSA
 
+from blockchain import BlockChainUtils
+
 class Voters():
 
     @staticmethod
@@ -26,3 +28,4 @@ class Voters():
                 return True
             f.close()
         return False
+
