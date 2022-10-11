@@ -9,12 +9,10 @@ from wallet import Wallet
 class BlockChain():
     
 
-    def __init__(self, nodeWallet) -> None:
+    def __init__(self) -> None:
         self.blocks = [Block.genesis()]
         self.accountModel = AccountModel()
         self.pos = ProofOfStake()
-        ## wallet associated with node that maintains dynamic instance of blockchain
-        self.nodeWallet = nodeWallet
         
 
     def addBlock(self, block):

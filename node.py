@@ -14,7 +14,7 @@ class Node():
     def __init__(self, hostIP, port, key = None) -> None:
         self.transactionPool = TransactionPool()
         self.wallet = Wallet()
-        self.blockChain = BlockChain(self.wallet)
+        self.blockChain = BlockChain()
         self.hostIP = hostIP
         self.port = port
         self.p2p = None
