@@ -1,6 +1,7 @@
 from flask_classful import FlaskView, route
 from flask import Flask, jsonify, request
 from utils import BlockChainUtils
+from vote_utils.registered_candidates import Candidates
 
 node = None
 
@@ -43,7 +44,29 @@ class NodeAPI(FlaskView):
         response = {'message': 'Received transaction'}
         return jsonify(response), 201
     
-    
-    
 
-    
+
+    @route('register', methods=['POST'])
+    def registerVoter(self):
+        print("Registering voter")
+        values = request.get_json()
+        if not 'publicKey' in values:
+            return 'Missing publicKey value', 400
+        publicKey = BlockChainUtils.decode(values['publicKey'])
+        node.handleRegistration(publicKey)
+        response = {'message': 'Received registration request'}
+        return jsonify(response), 201
+
+
+    @route('/candidates',methods=['GET'])
+    def getCandidates(self):
+        candidates = Candidates()
+        candidateKeys = candidates.getResiteredCandidates()
+        candidateDict = {}
+        for i, candidate in enumerate(candidateKeys) :
+            token = node.blockChain.accountModel.getBalance(candidate)
+            candidateDict[i] = {
+                'publicKey' : candidate,
+                'votes': token,
+            }
+        return candidateDict, 200

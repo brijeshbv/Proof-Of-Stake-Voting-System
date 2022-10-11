@@ -14,16 +14,24 @@ def postTransaction(sender, receiver, token, type):
     request = requests.post(url, json=package)
     print(request.text)
 
-if __name__ == '__main__':
-    bob = Wallet()
-    alice = Wallet()
-    alice.fromKey('keys/stakerPrivateKey.pem')
-    exchange = Wallet()
+def postRegistration(sender):
+    publicKey = sender.publicKeyString()
+    url = 'http://localhost:5000/register'
+    package = {'publicKey': BlockChainUtils.encode(publicKey)}
 
-    postTransaction(exchange, alice, 100, 'EXCHANGE')
-    sleep(0.25)
-    postTransaction(alice, alice, 25, 'STAKE')
+    request = requests.post(url, json=package)
+    print(request.text)
+
+if __name__ == '__main__':
+    
+    alice = Wallet()
+    alice.fromKey('keys/voter1PrivateKey.pem')
+    postRegistration(alice)
     sleep(1)
-    postTransaction(alice, bob, 1, 'TRANSFER')
+    bob = Wallet()
+    bob.fromKey('keys/candidate1PrivateKey.pem')
+    postTransaction(alice, bob, 1, "TRANSFER")
+    
+
 
     
