@@ -105,7 +105,6 @@ class Node():
     
     def handleBlockChainRequest(self, connectedNode):
         message = Message(self.p2p.socketConnector, 'BLOCKCHAIN', self.blockChain)
-        pprint(message)
         encodedMessage = BlockChainUtils.encode(message)
         print("sending blockchain to node", connectedNode)
         self.p2p.send(connectedNode, encodedMessage)
