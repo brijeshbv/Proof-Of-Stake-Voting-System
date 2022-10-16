@@ -32,3 +32,6 @@ class Transaction():
 
     def equals(self, transaction):
         return self.id == transaction.id
+
+    def isBetweenSameParties(self, sender , receiver):
+        return self.senderPublicKey == sender and self.receiverPublicKey == receiver
