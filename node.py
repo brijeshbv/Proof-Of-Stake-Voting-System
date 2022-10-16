@@ -76,8 +76,7 @@ class Node():
             print("blockcount invalid, requesting for longer blockchains")
             self.requestChain()
         if lastBlockHashValid and forgerValid and transactionsValid and transactionsValid and signatureValid and blockCountValid:
-            print("block added here 1")
-            self.blockChain.addBlock(block,self.saveBlockChainRef)
+            self.blockChain.addBlock(block)
             self.transactionPool.removeFromPool(block.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK',block)
             encodedMessage = BlockChainUtils.encode(message)
