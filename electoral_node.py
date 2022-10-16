@@ -11,8 +11,13 @@ class ElectoralNode(Node):
 
     def handleRegistration(self, publicKey):
         if Voters.isValidVoter(publicKey) == True:
-            exchangeTransaction = self.wallet.createTransaction(publicKey,self.NO_OF_VOTES, 'EXCHANGE' )
-            pprint(exchangeTransaction.payload())
-            if self.handleTransaction(exchangeTransaction):
-                print('registration added to transaction pool')
+            isAlreadyRegistered = self.blockChain.doesTransactionBetweenPartiesExist(self.wallet.publicKeyString(), publicKey)
+            print("is already registered",isAlreadyRegistered)
+            if isAlreadyRegistered == False:
+                exchangeTransaction = self.wallet.createTransaction(publicKey,self.NO_OF_VOTES, 'EXCHANGE' )
+                pprint(exchangeTransaction.payload())
+                if self.handleTransaction(exchangeTransaction):
+                    print('registration added to transaction pool')
+            else:
+                print("this voter is already registered, and more tokens won't be given")
 

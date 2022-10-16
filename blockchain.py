@@ -19,6 +19,7 @@ class BlockChain():
         self.executeTransactions(block.transactions)
         if self.blocks[-1].blockCount < block.blockCount:
             self.blocks.append(block)
+
     
     def toJson(self):
         data = {}
@@ -97,6 +98,17 @@ class BlockChain():
             for txn in block.transactions:
                 if txn.equals(transaction):
                     return True
+        return False
+    
+    def doesTransactionBetweenPartiesExist(self, senderPublicKey, receiverPublicKey):
+        '''checks only if there is a past transaction between two parties'''
+        print('len of blocks',len(self.blocks))
+        for block in self.blocks:
+            for txn in block.transactions:
+                if txn.isBetweenSameParties(senderPublicKey, receiverPublicKey):
+                    print('similar transactions found')
+                    return True
+        print('no similar transactions found')
         return False
     
     def forgerValid(self, block):

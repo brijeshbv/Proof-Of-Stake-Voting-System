@@ -8,7 +8,7 @@ from socket_communication import SocketCommunication
 from node_api import NodeAPI
 from message import Message
 from utils import BlockChainUtils
-
+import json
 class Node():
 
     def __init__(self, hostIP, port, key = None) -> None:
@@ -77,7 +77,7 @@ class Node():
             self.requestChain()
         if lastBlockHashValid and forgerValid and transactionsValid and transactionsValid and signatureValid and blockCountValid:
             print("block added here 1")
-            self.blockChain.addBlock(block)
+            self.blockChain.addBlock(block,self.saveBlockChainRef)
             self.transactionPool.removeFromPool(block.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK',block)
             encodedMessage = BlockChainUtils.encode(message)
@@ -96,6 +96,7 @@ class Node():
         if forger == self.wallet.publicKeyString():
             print("I am the next forger")
             newBlock = self.blockChain.createBlock(self.transactionPool.transactions, self.wallet)
+            self.saveBlockChain()
             self.transactionPool.removeFromPool(self.transactionPool.transactions)
             message = Message(self.p2p.socketConnector, 'BLOCK',newBlock)
             encodedMessage = BlockChainUtils.encode(message)
@@ -117,7 +118,13 @@ class Node():
             print(f'local {localBlockChainCount}, receivedBlockChainCount {receivedBlockChainCount}')
             for blockNumber, block in enumerate(blockChain.blocks):
                 if blockNumber >= localBlockChainCount :
-                    print("block added here 2")
                     localBlockChainCopy.addBlock(block)
                     self.transactionPool.removeFromPool(block.transactions)
             self.blockChain = localBlockChainCopy
+        
+    def saveBlockChain(self):
+        print('saving blockchain')
+        genesisKey = open('keys/genesisPublicKey.pem','r').read()
+        if self.wallet.publicKeyString() == genesisKey:
+            with open("blockchain.json", "w") as outfile:
+                json.dump(self.blockChain.toJson(), outfile)
