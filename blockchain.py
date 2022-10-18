@@ -16,6 +16,7 @@ class BlockChain():
         
 
     def addBlock(self, block):
+        """Add a new block to the block list"""
         self.executeTransactions(block.transactions)
         if self.blocks[-1].blockCount < block.blockCount:
             self.blocks.append(block)
@@ -36,11 +37,13 @@ class BlockChain():
         return self.blocks[-1].blockCount == block.blockCount -1
     
     def lastBlockHashValid(self, block):
+        """Validate the hash of the last block"""
         latestBlockChainBlockHash =  BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest()
 
         return latestBlockChainBlockHash == block.lastHash
 
     def getCoveredTransactionSet(self, transactions):
+        """Add transactions covered by the sender to coveredTransactions list and return that list"""
         coveredTransactions = []
         for transaction in transactions:
             if self.transactionCovered(transaction):
@@ -50,6 +53,7 @@ class BlockChain():
         return coveredTransactions
 
     def transactionCovered(self, transaction):
+        """Check if a transaction is covered by sender"""
         if transaction.type == "EXCHANGE":
             return True
         senderBalance = self.accountModel.getBalance(transaction.senderPublicKey)
@@ -64,6 +68,7 @@ class BlockChain():
             self.executeTransaction(transaction)
 
     def executeTransaction(self, transaction):
+        """Execute block transaction and update the token balance of sender and receiver"""
         if transaction.type == 'STAKE':
             sender = transaction.senderPublicKey
             receiver = transaction.receiverPublicKey
@@ -80,12 +85,14 @@ class BlockChain():
 
     
     def nextForger(self):
+        """Return the data hash of the last block"""
         lastBlockHash = BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest()
         nextForger = self.pos.forger(lastBlockHash)
         return nextForger
 
 
     def createBlock(self, transactionsFromPool, forgerWallet):
+        """Create a new block in blockchain"""
         coveredTransactions = self.getCoveredTransactionSet(transactionsFromPool)
         self.executeTransactions(coveredTransactions)
         newBlock = forgerWallet.createBlock(coveredTransactions, BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest(), len(self.blocks))
@@ -94,6 +101,7 @@ class BlockChain():
         return newBlock
         
     def doesTransactionExist(self, transaction):
+        """Check if a transaction already exists in the block's transactions list"""
         for block in self.blocks:
             for txn in block.transactions:
                 if txn.equals(transaction):
@@ -112,6 +120,7 @@ class BlockChain():
         return False
     
     def forgerValid(self, block):
+        """Check if a forger is valid by comparing the forger's public key with the proposed block's public key"""
         forgerPublicKey = self.pos.forger(block.lastHash)
         proposedBlockForger = block.forger
         if forgerPublicKey == proposedBlockForger:
@@ -119,6 +128,7 @@ class BlockChain():
         return False
     
     def transactionsValid(self, transactions):
+        """Validate the transactions by comparing the item count in coveredTransactions list with the item count of proposed transactions list"""
         coveredTransactions = self.getCoveredTransactionSet(transactions)
         if len(coveredTransactions) == len(transactions):
             return True

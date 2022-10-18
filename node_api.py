@@ -24,10 +24,12 @@ class NodeAPI(FlaskView):
     
     @route('/blockchain', methods=['GET'])
     def blockchain(self):
+        """Returns the entire blockchain in json format"""
         return node.blockChain.toJson(), 200
 
     @route('transactionPool', methods=['GET'])
     def transactionPool(self):
+        """Returns the transaction pool in json format"""
         transactions = {}
         for ctr, transaction in enumerate(node.transactionPool.transactions):
             transactions[ctr] = transaction.toJson()
@@ -35,6 +37,7 @@ class NodeAPI(FlaskView):
 
     @route('transaction', methods=['POST'])
     def transaction(self):
+        """Performs transaction"""
         print("performing transaction")
         values = request.get_json()
         if not 'transaction' in values:
@@ -48,6 +51,7 @@ class NodeAPI(FlaskView):
 
     @route('register', methods=['POST'])
     def registerVoter(self):
+        """Registers the voter"""
         print("Registering voter")
         values = request.get_json()
         if not 'publicKey' in values:
@@ -60,6 +64,7 @@ class NodeAPI(FlaskView):
 
     @route('/candidates',methods=['GET'])
     def getCandidates(self):
+        """Returns the candidates public key and votes"""
         candidates = Candidates()
         candidateKeys = candidates.getResiteredCandidates()
         candidateDict = {}
