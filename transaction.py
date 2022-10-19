@@ -18,8 +18,8 @@ class Transaction():
     def toJson(self):
         return self.__dict__
 
-    #adds signature to transaction.
     def addSign(self, signature):
+        """Adds signature to transaction"""
         self.signature = signature
 
     
@@ -31,6 +31,7 @@ class Transaction():
 
 
     def equals(self, transaction):
+        """Compares the transaction id"""
         return self.id == transaction.id
 
     def isBetweenSameParties(self, sender , receiver):

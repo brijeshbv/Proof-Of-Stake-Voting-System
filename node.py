@@ -31,6 +31,7 @@ class Node():
         self.api.start(apiPort)
 
     def handleTransaction(self, transaction):
+        """Handles transaction"""
         print("handling transaction")
         data = transaction.payload()
         signature = transaction.signature
@@ -64,6 +65,9 @@ class Node():
         return False
     
     def handleBlock(self, block):
+        """Validates the block, adds the block to the blockchain, 
+        removes the block from the block's transaction pool 
+        and broadcasts a message to peers to notify them about the newly added block"""
         forger = block.forger
         blockHash = block.payload()
         signature = block.signature
@@ -91,6 +95,7 @@ class Node():
         self.p2p.broadcast(encodeMessage)
 
     def forge(self):
+        """Creates the next forger"""
         forger = self.blockChain.nextForger()
         if forger == self.wallet.publicKeyString():
             print("I am the next forger")

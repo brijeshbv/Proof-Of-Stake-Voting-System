@@ -14,6 +14,7 @@ class Block():
 
     @staticmethod
     def genesis():
+        """Creates and returns the genesis block"""
         genesisBlock = Block([],'genesisHash','genesis',0)
         genesisBlock.timestamp = 0
         return genesisBlock
@@ -32,6 +33,7 @@ class Block():
         return data
 
     def payload(self):
+        """The signature is removed from a copy and returned. Useful for validating block"""
         jsonRep = copy.deepcopy(self.toJson())
         jsonRep["signature"] = ""
         return jsonRep
