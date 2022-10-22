@@ -27,6 +27,7 @@ python main.py localhost 10002 5003 keys/stakerPrivateKey.pem
 3. Test Script :
 <br />
 ```
-python interaction.py <test_no>
+python interaction.py >test_no<
 ```
+<br />
 test_no = [1,2,3,4]
