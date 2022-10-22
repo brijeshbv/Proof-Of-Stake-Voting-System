@@ -100,11 +100,12 @@ class Node():
         if forger == self.wallet.publicKeyString():
             print("I am the next forger")
             newBlock = self.blockChain.createBlock(self.transactionPool.transactions, self.wallet)
-            self.saveBlockChain()
-            self.transactionPool.removeFromPool(self.transactionPool.transactions)
-            message = Message(self.p2p.socketConnector, 'BLOCK',newBlock)
-            encodedMessage = BlockChainUtils.encode(message)
-            self.p2p.broadcast(encodedMessage)
+            if newBlock != None:
+                self.saveBlockChain()
+                self.transactionPool.removeFromPool(self.transactionPool.transactions)
+                message = Message(self.p2p.socketConnector, 'BLOCK',newBlock)
+                encodedMessage = BlockChainUtils.encode(message)
+                self.p2p.broadcast(encodedMessage)
         else:
             print("I am not the next forger")
     
