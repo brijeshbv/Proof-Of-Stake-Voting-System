@@ -1,6 +1,7 @@
 
 
 from block import Block
+from consensus_factory import getConsensusStrategy
 from proof_of_stake import ProofOfStake
 from utils import BlockChainUtils
 from accountmodel import AccountModel
@@ -12,7 +13,7 @@ class BlockChain():
     def __init__(self) -> None:
         self.blocks = [Block.genesis()]
         self.accountModel = AccountModel()
-        self.pos = ProofOfStake()
+        self.concensus = getConsensusStrategy('pos')
         
 
     def addBlock(self, block):
@@ -63,7 +64,7 @@ class BlockChain():
         else:
             return False
 
-    def executeTransactions(self, transactions):
+    def executeTransactions(self, transactions): 
         for transaction in transactions:
             self.executeTransaction(transaction)
 
@@ -74,7 +75,7 @@ class BlockChain():
             receiver = transaction.receiverPublicKey
             if sender == receiver:
                 token = transaction.token
-                self.pos.update(sender, token)
+                self.concensus.update(sender, token)
                 self.accountModel.updateBalance(sender, -token)
         sender = transaction.senderPublicKey
         receiver = transaction.receiverPublicKey
@@ -87,7 +88,7 @@ class BlockChain():
     def nextForger(self):
         """Return the data hash of the last block"""
         lastBlockHash = BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest()
-        nextForger = self.pos.forger(lastBlockHash)
+        nextForger = self.concensus.forger(lastBlockHash)
         return nextForger
 
 
@@ -95,10 +96,12 @@ class BlockChain():
         """Create a new block in blockchain"""
         coveredTransactions = self.getCoveredTransactionSet(transactionsFromPool)
         self.executeTransactions(coveredTransactions)
-        newBlock = forgerWallet.createBlock(coveredTransactions, BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest(), len(self.blocks))
-        self.blocks.append(newBlock)
-        print(f"created block  no {len(self.blocks)}")
-        return newBlock
+        if len(coveredTransactions) > 0:
+            newBlock = forgerWallet.createBlock(coveredTransactions, BlockChainUtils.hash(self.blocks[-1].payload()).hexdigest(), len(self.blocks))
+            self.blocks.append(newBlock)
+            print(f"created block  no {len(self.blocks)}")
+            return newBlock
+        return None
         
     def doesTransactionExist(self, transaction):
         """Check if a transaction already exists in the block's transactions list"""
@@ -121,7 +124,7 @@ class BlockChain():
     
     def forgerValid(self, block):
         """Check if a forger is valid by comparing the forger's public key with the proposed block's public key"""
-        forgerPublicKey = self.pos.forger(block.lastHash)
+        forgerPublicKey = self.concensus.forger(block.lastHash)
         proposedBlockForger = block.forger
         if forgerPublicKey == proposedBlockForger:
             return True

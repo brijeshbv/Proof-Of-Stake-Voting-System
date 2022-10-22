@@ -16,7 +16,7 @@ class Voters():
             'keys/voter7PublicKey.pem',
             'keys/voter8PublicKey.pem',
             'keys/voter9PublicKey.pem',
-            'keys/voter10PublicKey.pem'
+            'keys/stakerPublicKey.pem',
         ]
 
     @staticmethod
