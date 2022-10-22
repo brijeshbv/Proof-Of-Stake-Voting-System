@@ -24,14 +24,15 @@ class Test():
         voter2 = Wallet()
         voter2.fromKey('keys/voter2PrivateKey.pem')
         postRegistration(voter2)
-        sleep(1)
+        sleep(0.5)
         candidate1Key = getPublicKey('keys/candidate1PublicKey.pem')
         postTransaction(voter1, candidate1Key, 1, "TRANSFER")
         candidate2Key = getPublicKey('keys/candidate2PublicKey.pem')
         postTransaction(voter1, candidate2Key, 3, "TRANSFER")
-        sleep(1)
+        sleep(0.5)
         candidate3Key = getPublicKey('keys/candidate3PublicKey.pem')
         postTransaction(voter1, candidate3Key, 1, "TRANSFER")
+        sleep(0.5)
         postTransaction(voter2, candidate2Key, 4, "TRANSFER")
 
     def testOverVoting(self):
